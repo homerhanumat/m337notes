@@ -1,0 +1,151 @@
+---
+title: "CSC 303 Finale"
+---
+
+```{r}
+#| include: false
+library(LSTbook)
+knitr::opts_chunk$set(
+  error = TRUE
+)
+set.seed(2020)
+```
+
+## Setup
+
+Attach these packages:
+
+```{r eval = FALSE}
+library(tidyverse)
+library(LSTbook)
+```
+
+## Simulation Models
+
+
+Suppose that some exercise physiologists are researching whether taking a certain vitamin supplement makes people stronger.  Unknown to them, the supplement changes the amount a person can bench-press by:
+
+```{r}
+supplement_effect <- 2
+```
+
+
+They do an observational study involving a large number of people:
+
+```{r}
+n <- 2000
+```
+
+for each person they record whether not the person takes the supplement, and also how much (in pounds) the person can bench-press.  they also happen to record whether the person works out a the Hulk Power Gym or at Planet Fitness.
+
+Here is a simulation-maker for the situation:
+
+
+```{r}
+vitamin_sim <- datasim_make(
+  .m <- rnorm(n, mean = 0, sd = 100),
+  .w <- bernoulli(n, logodds = .m),
+  workout <- ifelse(
+    .w == 1,
+    "Hulk Power",
+    "Planet Fitness"
+  ),
+  .s <- bernoulli(n, logodds = .m),
+  supplement <- ifelse(
+    .s == 1,
+    "yes",
+    "no"
+  ),
+  bench <- 200 + .m / 5  + supplement_effect * .s + rnorm(n, sd = 10)
+)
+```
+
+When the statisticians take their sample of individuals, it is like sampling from this "model":
+
+```{r}
+vitamin_data <- vitamin_sim %>% 
+  take_sample(n = n)
+```
+
+Here is a little bit of their sample:
+
+```{r}
+vitamin_data %>% 
+  head(n = 10) %>% 
+  knitr::kable()
+```
+
+## A Bad Analysis:  Failure to Control
+
+Suppose statisticians do not control for the possible confounding variable.  Maybe they make graphs like this one:
+
+```{r}
+vitamin_data %>% 
+  ggplot(aes(x = supplement, y = bench)) +
+  geom_boxplot(fill = "burlywood")
+```
+
+And they make linear models like this one:
+
+
+```{r}
+mod <- lm(
+  bench ~ supplement,
+  data = vitamin_data
+)
+summary(mod)
+confint(mod)
+```
+
+Their work gives the (very wrong) impression that taking vitamins helps a lot.
+
+## Controlling
+
+Now suppose they exercise their common sense, and control for the possible confounder `workout`
+
+In graphs, they might do this/:
+
+```{r}
+vitamin_data %>% 
+  ggplot(aes(x = supplement, y = bench)) +
+  geom_boxplot(fill = "burlywood") +
+  facet_grid(. ~ workout)
+```
+With linear models, you control by adding in the possible confounder:
+
+```{r}
+mod2 <- lm(bench ~ supplement + workout, data = vitamin_data)
+summary(mod2)
+confint(mod2)
+```
+
+But:
+
+```{r}
+vitamin_data %>% 
+  ggplot(aes(x = workout)) +
+  geom_bar(aes(fill = supplement), color = "black")
+```
+
+
+## Experiments are Best
+
+Suppose they decide to do an experiment:
+
+```{r}
+vitamin_exp <- vitamin_sim %>% 
+  datasim_intervene(
+    .s <- bernoulli(n, prob = 0.5),
+    .w <- bernoulli(n, prob = 0.5)
+  )
+vitamin_exp_data <- vitamin_exp %>% 
+  take_sample(n = n)
+```
+
+```{r}
+mod3 <- lm(bench ~ supplement + workout, data = vitamin_exp_data)
+summary(mod3)
+confint(mod3)
+```
+
+

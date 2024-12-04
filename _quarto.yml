@@ -1,0 +1,20 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "MAT 337 Notes"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - csc303.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+
+

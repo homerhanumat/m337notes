@@ -1,0 +1,6 @@
+---
+title:  "Wlecome!"
+---
+
+
+This site will hold notes for MAT 337 at Georgetown College.
