@@ -475,17 +475,47 @@ workoutPlanet Fitness -23.83536  -7.343379</code></pre>
 </div>
 <p>Now the distribution is more even:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp_data <span class="sc">%&gt;%</span> </span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(supplement, workout) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
 <span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>Error in UseMethod("group_by"): no applicable method for 'group_by' applied to an object of class "c('list', 'datasim')"</code></pre>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">supplement</th>
+<th style="text-align: left;">workout</th>
+<th style="text-align: right;">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">Hulk Power</td>
+<td style="text-align: right;">499</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">no</td>
+<td style="text-align: left;">Planet Fitness</td>
+<td style="text-align: right;">480</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">Hulk Power</td>
+<td style="text-align: right;">503</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">yes</td>
+<td style="text-align: left;">Planet Fitness</td>
+<td style="text-align: right;">518</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bench <span class="sc">~</span> supplement <span class="sc">+</span> workout, <span class="at">data =</span> vitamin_exp_data)</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bench <span class="sc">~</span> supplement <span class="sc">+</span> workout, <span class="at">data =</span> vitamin_exp_data)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -507,7 +537,7 @@ Residual standard error: 22.83 on 1997 degrees of freedom
 Multiple R-squared:  0.004829,  Adjusted R-squared:  0.003833 
 F-statistic: 4.845 on 2 and 1997 DF,  p-value: 0.007957</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mod3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mod3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                            2.5 %      97.5 %
 (Intercept)           198.5090613 201.9796775

@@ -148,7 +148,7 @@ vitamin_exp_data <- vitamin_exp %>%
 Now the distribution is more even:
 
 ```{r}
-vitamin_exp %>% 
+vitamin_exp_data %>% 
   group_by(supplement, workout) %>% 
   summarize(n = n()) %>% 
   knitr::kable()
