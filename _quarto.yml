@@ -8,7 +8,13 @@ website:
     left:
       - href: index.qmd
         text: Home
-      - csc303.qmd
+  sidebar:
+    style: "floating"
+    search: false
+    contents:
+      - section: other-courses.qmd
+        contents:
+          - csc303.qmd
 
 format:
   html:

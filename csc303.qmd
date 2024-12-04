@@ -123,8 +123,9 @@ But:
 
 ```{r}
 vitamin_data %>% 
-  ggplot(aes(x = workout)) +
-  geom_bar(aes(fill = supplement), color = "black")
+  group_by(workout, supplement) %>% 
+  summarize(n = n()) %>% 
+  knitr::kable()
 ```
 
 
