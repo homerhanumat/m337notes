@@ -6,7 +6,9 @@ title: "CSC 303 Finale"
 #| include: false
 library(LSTbook)
 knitr::opts_chunk$set(
-  error = TRUE
+  error = TRUE,
+  warning = FALSE,
+  message = FALSE
 )
 set.seed(2020)
 ```
@@ -123,7 +125,7 @@ But:
 
 ```{r}
 vitamin_data %>% 
-  group_by(workout, supplement) %>% 
+  group_by(supplement, workout) %>% 
   summarize(n = n()) %>% 
   knitr::kable()
 ```
@@ -142,6 +144,16 @@ vitamin_exp <- vitamin_sim %>%
 vitamin_exp_data <- vitamin_exp %>% 
   take_sample(n = n)
 ```
+
+Now the distribution is more even:
+
+```{r}
+vitamin_exp %>% 
+  group_by(supplement, workout) %>% 
+  summarize(n = n()) %>% 
+  knitr::kable()
+```
+
 
 ```{r}
 mod3 <- lm(bench ~ supplement + workout, data = vitamin_exp_data)
