@@ -1,5 +1,10 @@
 ---
 title: "CSC 303 Finale"
+filters:
+  - webr
+webr:
+  repos: ["https://dtkaplan.r-universe.dev"]
+  packages: ["LSTbook"]
 ---
 
 ```{r}
@@ -255,5 +260,56 @@ mod4 <- lm(bench ~ supplement + workout, data = vitamin_exp_data_2)
 summary(mod4)
 confint(mod4)
 ```
+
+
+## Try It Yourself!
+
+Set the size of the effect of taking supplements:
+
+```{webr-r}
+#| autorun: true
+supplement_effect <- 2
+```
+
+
+```{webr-r}
+#| context: setup
+vitamin_sim <- datasim_make(
+  .m <- rnorm(n, mean = 0, sd = 100),
+  .w <- bernoulli(n, logodds = .m),
+  workout <- ifelse(
+    .w == 1,
+    "Hulk Power",
+    "Planet Fitness"
+  ),
+  .s <- bernoulli(n, logodds = .m),
+  supplement <- ifelse(
+    .s == 1,
+    "yes",
+    "no"
+  ),
+  bench <- 200 + .m / 5  + supplement_effect * .s + rnorm(n, sd = 10)
+)
+vitamin_exp <- vitamin_sim %>% 
+  datasim_intervene(
+    .s <- bernoulli(n, prob = 0.5),
+    .w <- bernoulli(n, prob = 0.5)
+  )
+```
+
+
+Now simulate performing the experiment, at various sample sizes:
+
+```{webr-r}
+vitamin_exp_data <-
+  vitamin_exp %>% 
+  take_sample(n = 2000)
+your_model <- lm(bench ~ supplement + workout, data = vitamin_exp_data)
+summary(your_model)
+confint(your_model)
+```
+
+
+
 
 
