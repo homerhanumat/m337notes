@@ -3,7 +3,7 @@ title: "CSC 303 Finale"
 filters:
   - webr
 webr:
-  repos: ["https://dtkaplan.r-universe.dev"]
+  repos: ["https://homerhanumat.r-universe.dev"]
   packages: ["LSTbook"]
 ---
 
