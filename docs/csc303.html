@@ -359,7 +359,7 @@ Table&nbsp;1: The first few rows of the sample data.
 </section>
 <section id="a-bad-analysis-failure-to-control" class="level2">
 <h2 class="anchored" data-anchor-id="a-bad-analysis-failure-to-control">A Bad Analysis: Failure to Control</h2>
-<p>Suppose statisticians think too simply. Maybe they make graphs like this <a href="#fig-vitamin-supplement" class="quarto-xref">Figure&nbsp;1</a>:</p>
+<p>Suppose the statisticians think too simply. Maybe they make graphs like <a href="#fig-vitamin-supplement" class="quarto-xref">Figure&nbsp;1</a>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>vitamin_data <span class="sc">%&gt;%</span> </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> supplement, <span class="at">y =</span> bench)) <span class="sc">+</span></span>
@@ -415,7 +415,7 @@ supplementyes  32.80463  35.56606</code></pre>
 </section>
 <section id="confounding-factors-and-controlling" class="level2">
 <h2 class="anchored" data-anchor-id="confounding-factors-and-controlling">Confounding Factors and Controlling</h2>
-<p>The statisticians have found that <code>supplement</code> and <code>becnh</code> are <em>associated</em>. But they really want to know whether <code>supplement</code> is part of what <em>causes</em> <code>bench</code>.</p>
+<p>The statisticians have found that <code>supplement</code> and <code>bench</code> are <em>associated</em>. But they really want to know whether <code>supplement</code> is part of what <em>causes</em> <code>bench</code>.</p>
 <p>When two variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are found to be associated, there are three possible explanations for the association:</p>
 <ul>
 <li><span class="math inline">\(X\)</span> is part of what causes <span class="math inline">\(Y\)</span>;</li>
@@ -424,7 +424,7 @@ supplementyes  32.80463  35.56606</code></pre>
 </ul>
 <p>In the third case above, the variable <span class="math inline">\(Z\)</span> is called a <em>confounding factor</em>.</p>
 <p>The statisticians have recorded the values of <code>workout</code>. They might wonder whether it is a confounding factor.</p>
-<p>Well, it is clearly associated with <code>supplment</code>, as shown here in <a href="#tbl-supplement-workout" class="quarto-xref">Table&nbsp;2</a>:</p>
+<p>Well, it is clearly associated with <code>supplement</code>, as shown here in <a href="#tbl-supplement-workout" class="quarto-xref">Table&nbsp;2</a>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>vitamin_data <span class="sc">%&gt;%</span> </span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(supplement, workout) <span class="sc">%&gt;%</span> </span>
@@ -491,7 +491,7 @@ Figure&nbsp;2: Boxplots of bench-press weight, by workout venue.
 </div>
 </div>
 </div>
-<p>So <code>workout</code> is associated with <code>supplment</code>, and associated with <code>bench</code>. If it were actually part of what <em>causes</em> <code>bench</code>, then it would be a confounding factor.</p>
+<p>So <code>workout</code> is associated with <code>supplement</code>, and associated with <code>bench</code>. If it were actually part of what <em>causes</em> <code>bench</code>, then it would be a confounding factor.</p>
 <p>Realizing that <code>workout</code> could be a confounding factor, the statisticians decide to control for it, by including it in their visualizations and their models.</p>
 <p>For a visualization, they might make something like <a href="#fig-obs" class="quarto-xref">Figure&nbsp;3</a>:</p>
 <div class="cell">

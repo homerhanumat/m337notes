@@ -81,7 +81,7 @@ vitamin_data %>%
 
 ## A Bad Analysis:  Failure to Control
 
-Suppose statisticians think too simply.  Maybe they make graphs like this @fig-vitamin-supplement:
+Suppose the statisticians think too simply.  Maybe they make graphs like @fig-vitamin-supplement:
 
 ```{r}
 #| label: fig-vitamin-supplement
@@ -107,7 +107,7 @@ Their work gives the (very wrong) impression that taking vitamins helps a **lot*
 
 ## Confounding Factors and Controlling
 
-The statisticians have found that `supplement` and `becnh` are *associated*.  But they really want to know whether `supplement` is part of what *causes* `bench`.
+The statisticians have found that `supplement` and `bench` are *associated*.  But they really want to know whether `supplement` is part of what *causes* `bench`.
 
 When two variables $X$ and $Y$ are found to be associated, there are three possible explanations for the association:
 
@@ -119,7 +119,7 @@ In the third case above, the variable $Z$ is called a *confounding factor*.
 
 The statisticians have recorded the values of `workout`.  They might wonder whether it is a confounding factor.
 
-Well, it is clearly associated with `supplment`, as shown here in @tbl-supplement-workout:
+Well, it is clearly associated with `supplement`, as shown here in @tbl-supplement-workout:
 
 ```{r}
 #| label: tbl-supplement-workout
@@ -140,7 +140,7 @@ vitamin_data %>%
   geom_boxplot(fill = "burlywood")
 ```
 
-So `workout` is associated with `supplment`, and associated with `bench`.  If it were actually part of what *causes* `bench`, then it would be a confounding factor.
+So `workout` is associated with `supplement`, and associated with `bench`.  If it were actually part of what *causes* `bench`, then it would be a confounding factor.
 
 Realizing that `workout` could be a confounding factor, the statisticians decide to control for it, by including it in their visualizations and their models.
 
