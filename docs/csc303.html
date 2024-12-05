@@ -101,6 +101,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -179,7 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
   <li><a href="#simulation-models" id="toc-simulation-models" class="nav-link" data-scroll-target="#simulation-models">Simulation Models</a></li>
   <li><a href="#a-bad-analysis-failure-to-control" id="toc-a-bad-analysis-failure-to-control" class="nav-link" data-scroll-target="#a-bad-analysis-failure-to-control">A Bad Analysis: Failure to Control</a></li>
-  <li><a href="#controlling" id="toc-controlling" class="nav-link" data-scroll-target="#controlling">Controlling</a></li>
+  <li><a href="#confounding-factors-and-controlling" id="toc-confounding-factors-and-controlling" class="nav-link" data-scroll-target="#confounding-factors-and-controlling">Confounding Factors and Controlling</a></li>
   <li><a href="#experiments-are-best" id="toc-experiments-are-best" class="nav-link" data-scroll-target="#experiments-are-best">Experiments are Best</a></li>
   </ul>
 </nav>
@@ -254,8 +283,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>vitamin_data <span class="sc">%&gt;%</span> </span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="tbl-sample-data" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sample-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: The first few rows of the sample data.
+</figcaption>
+<div aria-describedby="tbl-sample-data-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">workout</th>
@@ -318,18 +353,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 </div>
 </div>
+</figure>
+</div>
+</div>
 </section>
 <section id="a-bad-analysis-failure-to-control" class="level2">
 <h2 class="anchored" data-anchor-id="a-bad-analysis-failure-to-control">A Bad Analysis: Failure to Control</h2>
-<p>Suppose statisticians do not control for the possible confounding variable. Maybe they make graphs like this one:</p>
+<p>Suppose statisticians think too simply. Maybe they make graphs like this <a href="#fig-vitamin-supplement" class="quarto-xref">Figure&nbsp;1</a>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>vitamin_data <span class="sc">%&gt;%</span> </span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> supplement, <span class="at">y =</span> bench)) <span class="sc">+</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"burlywood"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="csc303_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<div id="fig-vitamin-supplement" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-vitamin-supplement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="csc303_files/figure-html/fig-vitamin-supplement-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-vitamin-supplement-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Boxplots of bench-press weight, by supplement use.
+</figcaption>
 </figure>
 </div>
 </div>
@@ -368,66 +411,33 @@ F-statistic:  2358 on 1 and 1998 DF,  p-value: &lt; 2.2e-16</code></pre>
 supplementyes  32.80463  35.56606</code></pre>
 </div>
 </div>
-<p>Their work gives the (very wrong) impression that taking vitamins helps a lot.</p>
+<p>Their work gives the (very wrong) impression that taking vitamins helps a <strong>lot</strong>.</p>
 </section>
-<section id="controlling" class="level2">
-<h2 class="anchored" data-anchor-id="controlling">Controlling</h2>
-<p>Now suppose they exercise their common sense, and control for the possible confounder <code>workout</code></p>
-<p>In graphs, they might do this/:</p>
+<section id="confounding-factors-and-controlling" class="level2">
+<h2 class="anchored" data-anchor-id="confounding-factors-and-controlling">Confounding Factors and Controlling</h2>
+<p>The statisticians have found that <code>supplement</code> and <code>becnh</code> are <em>associated</em>. But they really want to know whether <code>supplement</code> is part of what <em>causes</em> <code>bench</code>.</p>
+<p>When two variables <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span> are found to be associated, there are three possible explanations for the association:</p>
+<ul>
+<li><span class="math inline">\(X\)</span> is part of what causes <span class="math inline">\(Y\)</span>;</li>
+<li><span class="math inline">\(Y\)</span> is part of what causes <span class="math inline">\(X\)</span>;</li>
+<li>there is a third variable <span class="math inline">\(Z\)</span> that is associated with <span class="math inline">\(X\)</span> and which helps to causes <span class="math inline">\(Y\)</span>.</li>
+</ul>
+<p>In the third case above, the variable <span class="math inline">\(Z\)</span> is called a <em>confounding factor</em>.</p>
+<p>The statisticians have recorded the values of <code>workout</code>. They might wonder whether it is a confounding factor.</p>
+<p>Well, it is clearly associated with <code>supplment</code>, as shown here in <a href="#tbl-supplement-workout" class="quarto-xref">Table&nbsp;2</a>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>vitamin_data <span class="sc">%&gt;%</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> supplement, <span class="at">y =</span> bench)) <span class="sc">+</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"burlywood"</span>) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(. <span class="sc">~</span> workout)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(supplement, workout) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="tbl-supplement-workout" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-supplement-workout-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Workout venue, by supplement use.
+</figcaption>
+<div aria-describedby="tbl-supplement-workout-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="csc303_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>With linear models, you control by adding in the possible confounder:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bench <span class="sc">~</span> supplement <span class="sc">+</span> workout, <span class="at">data =</span> vitamin_data)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = bench ~ supplement + workout, data = vitamin_data)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--64.317 -10.316  -0.159  10.526  58.643 
-
-Coefficients:
-                      Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)            199.764      4.201  47.556  &lt; 2e-16 ***
-supplementyes           18.813      4.205   4.474 8.11e-06 ***
-workoutPlanet Fitness  -15.589      4.205  -3.708 0.000215 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 15.68 on 1997 degrees of freedom
-Multiple R-squared:  0.5444,    Adjusted R-squared:  0.544 
-F-statistic:  1193 on 2 and 1997 DF,  p-value: &lt; 2.2e-16</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mod2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>                          2.5 %     97.5 %
-(Intercept)           191.52562 208.001515
-supplementyes          10.56655  27.059981
-workoutPlanet Fitness -23.83536  -7.343379</code></pre>
-</div>
-</div>
-<p>But:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>vitamin_data <span class="sc">%&gt;%</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(supplement, workout) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">supplement</th>
@@ -460,27 +470,127 @@ workoutPlanet Fitness -23.83536  -7.343379</code></pre>
 </table>
 </div>
 </div>
+</figure>
+</div>
+</div>
+<p>Also, it is associated with <code>bench</code>, as indicated by <a href="#fig-bench-workout" class="quarto-xref">Figure&nbsp;2</a> below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>vitamin_data <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> workout, <span class="at">y =</span> bench)) <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"burlywood"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-bench-workout" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bench-workout-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="csc303_files/figure-html/fig-bench-workout-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bench-workout-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Boxplots of bench-press weight, by workout venue.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>So <code>workout</code> is associated with <code>supplment</code>, and associated with <code>bench</code>. If it were actually part of what <em>causes</em> <code>bench</code>, then it would be a confounding factor.</p>
+<p>Realizing that <code>workout</code> could be a confounding factor, the statisticians decide to control for it, by including it in their visualizations and their models.</p>
+<p>For a visualization, they might make something like <a href="#fig-obs" class="quarto-xref">Figure&nbsp;3</a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>vitamin_data <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> supplement, <span class="at">y =</span> bench)) <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"burlywood"</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(. <span class="sc">~</span> workout)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-obs" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-obs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="csc303_files/figure-html/fig-obs-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-obs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: Boxplots of bench-press weight by supplement use, for the two workout venues, in the observational study.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>With linear models, they control by adding in the possible confounder:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bench <span class="sc">~</span> supplement <span class="sc">+</span> workout, <span class="at">data =</span> vitamin_data)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = bench ~ supplement + workout, data = vitamin_data)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-64.317 -10.316  -0.159  10.526  58.643 
+
+Coefficients:
+                      Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)            199.764      4.201  47.556  &lt; 2e-16 ***
+supplementyes           18.813      4.205   4.474 8.11e-06 ***
+workoutPlanet Fitness  -15.589      4.205  -3.708 0.000215 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 15.68 on 1997 degrees of freedom
+Multiple R-squared:  0.5444,    Adjusted R-squared:  0.544 
+F-statistic:  1193 on 2 and 1997 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mod2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                          2.5 %     97.5 %
+(Intercept)           191.52562 208.001515
+supplementyes          10.56655  27.059981
+workoutPlanet Fitness -23.83536  -7.343379</code></pre>
+</div>
+</div>
+<p>It appears that the supplement still helps, but not by as much as previously thought.</p>
 </section>
 <section id="experiments-are-best" class="level2">
 <h2 class="anchored" data-anchor-id="experiments-are-best">Experiments are Best</h2>
-<p>Suppose they decide to do an experiment:</p>
+<p>Of course, the statisticians do not know the real situation, which is that:</p>
+<ul>
+<li><code>supplement</code> is a small part of what causes <code>bench</code>, but</li>
+<li>motivation-level (<code>.m</code>) is a much larger part of what causes <code>bench</code>, and</li>
+<li>motivation-level also causes <code>supplement</code> (and <code>workout</code> too).</li>
+</ul>
+<p>This underlying reality is illustrated in the the figure below:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp <span class="ot">&lt;-</span> vitamin_sim <span class="sc">%&gt;%</span> </span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datasim_intervene</span>(</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    .s <span class="ot">&lt;-</span> <span class="fu">bernoulli</span>(n, <span class="at">prob =</span> <span class="fl">0.5</span>),</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    .w <span class="ot">&lt;-</span> <span class="fu">bernoulli</span>(n, <span class="at">prob =</span> <span class="fl">0.5</span>)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>vitamin_exp_data <span class="ot">&lt;-</span> vitamin_exp <span class="sc">%&gt;%</span> </span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">take_sample</span>(<span class="at">n =</span> n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Now the distribution is more even:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp_data <span class="sc">%&gt;%</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(supplement, workout) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dag_draw</span>(vitamin_sim, <span class="at">report_hidden =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
+<div>
+<figure class="figure">
+<p><img src="csc303_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>An observational study will miss underlying causal relationships among variables that it does not measure!</p>
+<p>In an <em>experiment</em>, researchers choose the values of explanatory variables for their subjects. A good plan for an experiment is to let a chance process determine which subjects take supplements, and which subjects workout at which venue:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp <span class="ot">&lt;-</span> vitamin_sim <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datasim_intervene</span>(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    .s <span class="ot">&lt;-</span> <span class="fu">bernoulli</span>(n, <span class="at">prob =</span> <span class="fl">0.5</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    .w <span class="ot">&lt;-</span> <span class="fu">bernoulli</span>(n, <span class="at">prob =</span> <span class="fl">0.5</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>vitamin_exp_data <span class="ot">&lt;-</span> vitamin_exp <span class="sc">%&gt;%</span> </span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">take_sample</span>(<span class="at">n =</span> n, <span class="at">report_hidden =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now <code>supplement</code> and <code>workout</code> are no longer associated, as seen in <a href="#tbl-supplement-workout-exp" class="quarto-xref">Table&nbsp;3</a> below</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp_data <span class="sc">%&gt;%</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(supplement, workout) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="tbl-supplement-workout-exp" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-supplement-workout-exp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Workout venue by supplement use, in the randomized experiment.
+</figcaption>
+<div aria-describedby="tbl-supplement-workout-exp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="do-not-create-environment cell caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
 <th style="text-align: left;">supplement</th>
@@ -492,30 +602,53 @@ workoutPlanet Fitness -23.83536  -7.343379</code></pre>
 <tr class="odd">
 <td style="text-align: left;">no</td>
 <td style="text-align: left;">Hulk Power</td>
-<td style="text-align: right;">499</td>
+<td style="text-align: right;">471</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">no</td>
 <td style="text-align: left;">Planet Fitness</td>
-<td style="text-align: right;">480</td>
+<td style="text-align: right;">519</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">yes</td>
 <td style="text-align: left;">Hulk Power</td>
-<td style="text-align: right;">503</td>
+<td style="text-align: right;">510</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">yes</td>
 <td style="text-align: left;">Planet Fitness</td>
-<td style="text-align: right;">518</td>
+<td style="text-align: right;">500</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
+</figure>
+</div>
+</div>
+<p>A visualization based on the experiment is shown in <a href="#fig-exp" class="quarto-xref">Figure&nbsp;4</a>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bench <span class="sc">~</span> supplement <span class="sc">+</span> workout, <span class="at">data =</span> vitamin_exp_data)</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp_data <span class="sc">%&gt;%</span> </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> supplement, <span class="at">y =</span> bench)) <span class="sc">+</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">"burlywood"</span>) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(. <span class="sc">~</span> workout)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-exp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-exp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="csc303_files/figure-html/fig-exp-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-exp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4: Boxplots of bench-press weight by supplement use, for the two workout venues, in the experiment.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Linear models now give a more accurate assessment of the effect of <code>supplement</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>mod3 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bench <span class="sc">~</span> supplement <span class="sc">+</span> workout, <span class="at">data =</span> vitamin_exp_data)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
@@ -523,26 +656,94 @@ lm(formula = bench ~ supplement + workout, data = vitamin_exp_data)
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--73.903 -16.039  -0.445  15.410  85.174 
+-78.054 -14.737   0.341  14.992  80.655 
 
 Coefficients:
                       Estimate Std. Error t value Pr(&gt;|t|)    
-(Intercept)           200.2444     0.8848 226.305  &lt; 2e-16 ***
-supplementyes           2.8773     1.0213   2.817  0.00489 ** 
-workoutPlanet Fitness  -1.4010     1.0211  -1.372  0.17018    
+(Intercept)           199.6829     0.8816 226.498   &lt;2e-16 ***
+supplementyes           0.8541     0.9986   0.855    0.392    
+workoutPlanet Fitness   0.5589     0.9987   0.560    0.576    
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-Residual standard error: 22.83 on 1997 degrees of freedom
-Multiple R-squared:  0.004829,  Adjusted R-squared:  0.003833 
-F-statistic: 4.845 on 2 and 1997 DF,  p-value: 0.007957</code></pre>
+Residual standard error: 22.32 on 1997 degrees of freedom
+Multiple R-squared:  0.0005094, Adjusted R-squared:  -0.0004916 
+F-statistic: 0.5089 on 2 and 1997 DF,  p-value: 0.6013</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mod3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mod3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                            2.5 %      97.5 %
-(Intercept)           198.5090613 201.9796775
-supplementyes           0.8743494   4.8801711
-workoutPlanet Fitness  -3.4034964   0.6014499</code></pre>
+<pre><code>                           2.5 %     97.5 %
+(Intercept)           197.953920 201.411868
+supplementyes          -1.104197   2.812486
+workoutPlanet Fitness  -1.399712   2.517482</code></pre>
+</div>
+</div>
+<p>Why does this work? It’s because the experiment broke the connection between the lurking variable motivation-level (<code>.m</code>) and the explanatory variables in the study, as shown in <a href="#fig-motivation" class="quarto-xref">Figure&nbsp;5</a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp_data <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> supplement, <span class="at">y =</span> .m)) <span class="sc">+</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_violin</span>(<span class="at">fill =</span> <span class="st">"burlywood"</span>) <span class="sc">+</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">width =</span> <span class="fl">0.25</span>, <span class="at">size =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(. <span class="sc">~</span> workout) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">"motivation-level"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-motivation" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-motivation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="csc303_files/figure-html/fig-motivation-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-motivation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5: Motivation-level, for each of the treatment groups in the experiment.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>This is further illustrated by the following diagram:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dag_draw</span>(vitamin_exp, <span class="at">report_hidden =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="csc303_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Any statistically-significant differences in bench-press weight between the groups can now be attributed to the supplement.</p>
+<p>Note that the actually impact of <code>supplement</code> on <code>bench</code> is so small that a much larger experiment would be required, in order to be sure of detecting the impact:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>vitamin_exp_data_2 <span class="ot">&lt;-</span> vitamin_exp <span class="sc">%&gt;%</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">take_sample</span>(<span class="at">n =</span> <span class="dv">10000</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>mod4 <span class="ot">&lt;-</span> <span class="fu">lm</span>(bench <span class="sc">~</span> supplement <span class="sc">+</span> workout, <span class="at">data =</span> vitamin_exp_data_2)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mod4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = bench ~ supplement + workout, data = vitamin_exp_data_2)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-88.83 -15.22  -0.08  15.36  95.03 
+
+Coefficients:
+                      Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)           199.4091     0.3886 513.207  &lt; 2e-16 ***
+supplementyes           2.3232     0.4506   5.155 2.58e-07 ***
+workoutPlanet Fitness   0.3416     0.4507   0.758    0.449    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 22.53 on 9997 degrees of freedom
+Multiple R-squared:  0.002715,  Adjusted R-squared:  0.002515 
+F-statistic: 13.61 on 2 and 9997 DF,  p-value: 1.255e-06</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confint</span>(mod4)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                            2.5 %     97.5 %
+(Intercept)           198.6474736 200.170765
+supplementyes           1.4398239   3.206533
+workoutPlanet Fitness  -0.5418485   1.224993</code></pre>
 </div>
 </div>
 

@@ -72,6 +72,8 @@ vitamin_data <- vitamin_sim %>%
 Here is a little bit of their sample:
 
 ```{r}
+#| label: tbl-sample-data
+#| tbl-cap: "The first few rows of the sample data."
 vitamin_data %>% 
   head(n = 10) %>% 
   knitr::kable()
@@ -79,9 +81,11 @@ vitamin_data %>%
 
 ## A Bad Analysis:  Failure to Control
 
-Suppose statisticians do not control for the possible confounding variable.  Maybe they make graphs like this one:
+Suppose statisticians think too simply.  Maybe they make graphs like this @fig-vitamin-supplement:
 
 ```{r}
+#| label: fig-vitamin-supplement
+#| fig-cap: "Boxplots of bench-press weight, by supplement use."
 vitamin_data %>% 
   ggplot(aes(x = supplement, y = bench)) +
   geom_boxplot(fill = "burlywood")
@@ -99,21 +103,58 @@ summary(mod)
 confint(mod)
 ```
 
-Their work gives the (very wrong) impression that taking vitamins helps a lot.
+Their work gives the (very wrong) impression that taking vitamins helps a **lot**.
 
-## Controlling
+## Confounding Factors and Controlling
 
-Now suppose they exercise their common sense, and control for the possible confounder `workout`
+The statisticians have found that `supplement` and `becnh` are *associated*.  But they really want to know whether `supplement` is part of what *causes* `bench`.
 
-In graphs, they might do this/:
+When two variables $X$ and $Y$ are found to be associated, there are three possible explanations for the association:
+
+* $X$ is part of what causes $Y$;
+* $Y$ is part of what causes $X$;
+* there is a third variable $Z$ that is associated with $X$ and which helps to causes $Y$.
+
+In the third case above, the variable $Z$ is called a *confounding factor*.
+
+The statisticians have recorded the values of `workout`.  They might wonder whether it is a confounding factor.
+
+Well, it is clearly associated with `supplment`, as shown here in @tbl-supplement-workout:
 
 ```{r}
+#| label: tbl-supplement-workout
+#| tbl-cap: "Workout venue, by supplement use."
+vitamin_data %>% 
+  group_by(supplement, workout) %>% 
+  summarize(n = n()) %>% 
+  knitr::kable()
+```
+
+Also, it is associated with `bench`, as indicated by @fig-bench-workout below:
+
+```{r}
+#| label: fig-bench-workout
+#| fig-cap: "Boxplots of bench-press weight, by workout venue."
+vitamin_data %>% 
+  ggplot(aes(x = workout, y = bench)) +
+  geom_boxplot(fill = "burlywood")
+```
+
+So `workout` is associated with `supplment`, and associated with `bench`.  If it were actually part of what *causes* `bench`, then it would be a confounding factor.
+
+Realizing that `workout` could be a confounding factor, the statisticians decide to control for it, by including it in their visualizations and their models.
+
+For a visualization, they might make something like @fig-obs:
+
+```{r}
+#| label: fig-obs
+#| fig-cap: "Boxplots of bench-press weight by supplement use, for the two workout venues, in the observational study."
 vitamin_data %>% 
   ggplot(aes(x = supplement, y = bench)) +
   geom_boxplot(fill = "burlywood") +
   facet_grid(. ~ workout)
 ```
-With linear models, you control by adding in the possible confounder:
+With linear models, they control by adding in the possible confounder:
 
 ```{r}
 mod2 <- lm(bench ~ supplement + workout, data = vitamin_data)
@@ -121,19 +162,27 @@ summary(mod2)
 confint(mod2)
 ```
 
-But:
-
-```{r}
-vitamin_data %>% 
-  group_by(supplement, workout) %>% 
-  summarize(n = n()) %>% 
-  knitr::kable()
-```
+It appears that the supplement still helps, but not by as much as previously thought.
 
 
 ## Experiments are Best
 
-Suppose they decide to do an experiment:
+Of course, the statisticians do not know the real situation, which is that:
+
+* `supplement` is a small part of what causes `bench`, but
+* motivation-level (`.m`) is a much larger part of what causes `bench`, and
+* motivation-level also causes `supplement` (and `workout` too).
+
+This underlying reality is illustrated in the the figure below:
+
+```{r}
+dag_draw(vitamin_sim, report_hidden = TRUE)
+```
+
+
+An observational study will miss underlying causal relationships among variables that it does not measure!
+
+In an *experiment*, researchers choose the values of explanatory variables for their subjects.  A good plan for an experiment is to let a chance process determine which subjects take supplements, and which subjects workout at which venue:
 
 ```{r}
 vitamin_exp <- vitamin_sim %>% 
@@ -142,23 +191,69 @@ vitamin_exp <- vitamin_sim %>%
     .w <- bernoulli(n, prob = 0.5)
   )
 vitamin_exp_data <- vitamin_exp %>% 
-  take_sample(n = n)
+  take_sample(n = n, report_hidden = TRUE)
 ```
 
-Now the distribution is more even:
+Now `supplement` and `workout` are no longer associated, as seen in @tbl-supplement-workout-exp below
 
 ```{r}
+#| label: tbl-supplement-workout-exp
+#| tbl-cap: "Workout venue by supplement use, in the randomized experiment."
 vitamin_exp_data %>% 
   group_by(supplement, workout) %>% 
   summarize(n = n()) %>% 
   knitr::kable()
 ```
 
+A visualization based on the experiment is shown in @fig-exp:
+
+```{r}
+#| label: fig-exp
+#| fig-cap: "Boxplots of bench-press weight by supplement use, for the two workout venues, in the experiment."
+vitamin_exp_data %>% 
+  ggplot(aes(x = supplement, y = bench)) +
+  geom_boxplot(fill = "burlywood") +
+  facet_grid(. ~ workout)
+```
+
+Linear models now give a more accurate assessment of the effect of `supplement`:
 
 ```{r}
 mod3 <- lm(bench ~ supplement + workout, data = vitamin_exp_data)
 summary(mod3)
 confint(mod3)
+```
+
+Why does this work?  It's because the experiment broke the connection between the lurking variable motivation-level (`.m`) and the explanatory variables in the study, as shown in @fig-motivation
+
+```{r}
+#| label: fig-motivation
+#| fig-cap: "Motivation-level, for each of the treatment groups in the experiment."
+vitamin_exp_data %>% 
+  ggplot(aes(x = supplement, y = .m)) +
+  geom_violin(fill = "burlywood") +
+  geom_jitter(width = 0.25, size = 0.1) +
+  facet_grid(. ~ workout) +
+  labs(y = "motivation-level")
+```
+
+This is further illustrated by the following diagram:
+
+```{r}
+dag_draw(vitamin_exp, report_hidden = TRUE)
+```
+
+
+Any statistically-significant differences in bench-press weight between the groups can now be attributed to the supplement.
+
+Note that the actually impact of `supplement` on `bench` is so small that a much larger experiment would be required, in order to be sure of detecting the impact:
+
+```{r}
+vitamin_exp_data_2 <- vitamin_exp %>% 
+  take_sample(n = 10000)
+mod4 <- lm(bench ~ supplement + workout, data = vitamin_exp_data_2)
+summary(mod4)
+confint(mod4)
 ```
 
 
