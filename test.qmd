@@ -80,6 +80,13 @@ supplement_exp <- supplement_sim |>
     supplement <- bernoulli(n, prob = 0.5, labels = c("no", "yes")),
     workout <- bernoulli(n, prob = 0.5, labels = c("Planet Fitness", "Hulk Power"))
   )
+```
+
+Note that in the above call, `supplement` and `workout` are defined in reverse order to the order they were defined in `supplement_sim`.
+
+Now a sample:
+
+```{r}
 supplement_exp_data <- supplement_exp |>  
   take_sample(n = n, report_hidden = TRUE)
 ```
@@ -92,5 +99,5 @@ supplement_exp_data |>
   knitr::kable()
 ```
 
-`supplement` and `workout` labels are switched.
+The new columns have the wrong names.
 
