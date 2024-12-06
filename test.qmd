@@ -1,0 +1,96 @@
+---
+title: "Test"
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(
+  error = TRUE
+)
+set.seed(2020)
+```
+
+## Setup
+
+```{r}
+library(LSTbook)
+```
+
+
+## Simulation Model
+
+
+Suppose that some exercise physiologists are researching whether taking a certain vitamin supplement makes people stronger.  Unknown to them, the supplement changes the amount a person can bench-press by:
+
+```{r}
+supplement_effect <- 2
+```
+
+
+They do an observational study involving a large number of people:
+
+```{r}
+n <- 2000
+```
+
+For each person they record whether not the person takes the supplement, and also how much (in pounds) the person can bench-press.  They also happen to record whether the person works out at the Hulk Power Gym or at Planet Fitness.
+
+Here is a simulation-maker for the situation:
+
+
+```{r}
+supplement_sim <- datasim_make(
+  .motivation <- rnorm(n, mean = 0, sd = 10),
+  workout <- bernoulli(
+    n, logodds = .motivation,
+    labels = c("Planet Fitness", "Hulk Power")
+  ),
+  supplement <- bernoulli(
+    n, logodds = .motivation,
+    labels = c("no", "yes")
+    ),
+  bench <- 200 + 0.2 * .motivation  + supplement_effect * (supplement == "yes") + rnorm(n, sd = 10)
+)
+```
+
+The sample:
+
+```{r}
+supplement_data <- supplement_sim |>  
+  take_sample(n = n, report_hidden = TRUE)
+```
+
+Some of the data:
+
+```{r}
+#| label: tbl-sample-data
+#| tbl-cap: "The first few rows of the sample data."
+supplement_data |>  
+  head(n = 10) |>  
+  knitr::kable()
+```
+
+
+## Intervention
+
+
+```{r}
+supplement_exp <- supplement_sim |>  
+  datasim_intervene(
+    supplement <- bernoulli(n, prob = 0.5, labels = c("no", "yes")),
+    workout <- bernoulli(n, prob = 0.5, labels = c("Planet Fitness", "Hulk Power"))
+  )
+supplement_exp_data <- supplement_exp |>  
+  take_sample(n = n, report_hidden = TRUE)
+```
+
+Look at the data:
+
+```{r}
+supplement_exp_data |> 
+  head(10) |> 
+  knitr::kable()
+```
+
+`supplement` and `workout` labels are switched.
+

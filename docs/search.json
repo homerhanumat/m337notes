@@ -1,5 +1,58 @@
 [
   {
+    "objectID": "test.html",
+    "href": "test.html",
+    "title": "Test",
+    "section": "",
+    "text": "library(LSTbook)"
+  },
+  {
+    "objectID": "test.html#setup",
+    "href": "test.html#setup",
+    "title": "Test",
+    "section": "",
+    "text": "library(LSTbook)"
+  },
+  {
+    "objectID": "test.html#simulation-model",
+    "href": "test.html#simulation-model",
+    "title": "Test",
+    "section": "Simulation Model",
+    "text": "Simulation Model\nSuppose that some exercise physiologists are researching whether taking a certain vitamin supplement makes people stronger. Unknown to them, the supplement changes the amount a person can bench-press by:\n\nsupplement_effect &lt;- 2\n\nThey do an observational study involving a large number of people:\n\nn &lt;- 2000\n\nFor each person they record whether not the person takes the supplement, and also how much (in pounds) the person can bench-press. They also happen to record whether the person works out at the Hulk Power Gym or at Planet Fitness.\nHere is a simulation-maker for the situation:\n\nsupplement_sim &lt;- datasim_make(\n  .motivation &lt;- rnorm(n, mean = 0, sd = 10),\n  workout &lt;- bernoulli(\n    n, logodds = .motivation,\n    labels = c(\"Planet Fitness\", \"Hulk Power\")\n  ),\n  supplement &lt;- bernoulli(\n    n, logodds = .motivation,\n    labels = c(\"no\", \"yes\")\n    ),\n  bench &lt;- 200 + 0.2 * .motivation  + supplement_effect * (supplement == \"yes\") + rnorm(n, sd = 10)\n)\n\nThe sample:\n\nsupplement_data &lt;- supplement_sim |&gt;  \n  take_sample(n = n, report_hidden = TRUE)\n\nSome of the data:\n\nsupplement_data |&gt;  \n  head(n = 10) |&gt;  \n  knitr::kable()\n\n\n\nTable 1: The first few rows of the sample data.\n\n\n\n\n\n\n.motivation\nworkout\nsupplement\nbench\n\n\n\n\n3.769721\nHulk Power\nyes\n206.6718\n\n\n3.015484\nHulk Power\nyes\n203.0870\n\n\n-10.980232\nPlanet Fitness\nno\n199.1227\n\n\n-11.304059\nPlanet Fitness\nno\n223.9782\n\n\n-27.965343\nPlanet Fitness\nno\n187.0588\n\n\n7.205735\nHulk Power\nyes\n202.4153\n\n\n9.391210\nHulk Power\nyes\n198.1216\n\n\n-2.293778\nPlanet Fitness\nno\n191.3822\n\n\n17.591313\nHulk Power\nyes\n213.6791\n\n\n1.173668\nHulk Power\nyes\n199.6267"
+  },
+  {
+    "objectID": "test.html#intervention",
+    "href": "test.html#intervention",
+    "title": "Test",
+    "section": "Intervention",
+    "text": "Intervention\n\nsupplement_exp &lt;- supplement_sim |&gt;  \n  datasim_intervene(\n    supplement &lt;- bernoulli(n, prob = 0.5, labels = c(\"no\", \"yes\")),\n    workout &lt;- bernoulli(n, prob = 0.5, labels = c(\"Planet Fitness\", \"Hulk Power\"))\n  )\nsupplement_exp_data &lt;- supplement_exp |&gt;  \n  take_sample(n = n, report_hidden = TRUE)\n\nLook at the data:\n\nsupplement_exp_data |&gt; \n  head(10) |&gt; \n  knitr::kable()\n\n\n\n\n.motivation\nworkout\nsupplement\nbench\n\n\n\n\n5.6834028\nyes\nPlanet Fitness\n219.2998\n\n\n4.7019255\nno\nPlanet Fitness\n196.7549\n\n\n8.0577493\nyes\nPlanet Fitness\n198.0058\n\n\n10.2428926\nno\nHulk Power\n202.7830\n\n\n-19.5644577\nno\nPlanet Fitness\n195.2074\n\n\n5.5400291\nyes\nHulk Power\n201.8643\n\n\n-12.0925323\nyes\nPlanet Fitness\n213.2003\n\n\n-1.9054482\nyes\nPlanet Fitness\n213.5987\n\n\n4.2743352\nyes\nPlanet Fitness\n220.2219\n\n\n0.3056044\nyes\nPlanet Fitness\n219.9572\n\n\n\n\n\nsupplement and workout labels are switched."
+  },
+  {
+    "objectID": "mat337-overview..html",
+    "href": "mat337-overview..html",
+    "title": "MAT 337 Material",
+    "section": "",
+    "text": "Forthcoming."
+  },
+  {
+    "objectID": "other-courses.html",
+    "href": "other-courses.html",
+    "title": "Other courses",
+    "section": "",
+    "text": "Material from some related courses is here.",
+    "crumbs": [
+      "Home",
+      "Other courses"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome!",
+    "section": "",
+    "text": "This site will hold notes for MAT 337 at Georgetown College."
+  },
+  {
     "objectID": "csc303.html",
     "href": "csc303.html",
     "title": "CSC 303 Finale",
@@ -82,30 +135,5 @@
       "Other courses",
       "CSC 303 Finale"
     ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Welcome!",
-    "section": "",
-    "text": "This site will hold notes for MAT 337 at Georgetown College."
-  },
-  {
-    "objectID": "other-courses.html",
-    "href": "other-courses.html",
-    "title": "Other courses",
-    "section": "",
-    "text": "Material from some related courses is here.",
-    "crumbs": [
-      "Home",
-      "Other courses"
-    ]
-  },
-  {
-    "objectID": "mat337-overview..html",
-    "href": "mat337-overview..html",
-    "title": "MAT 337 Material",
-    "section": "",
-    "text": "Forthcoming."
   }
 ]
